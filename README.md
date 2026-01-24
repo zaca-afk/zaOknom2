@@ -1,0 +1,2 @@
+# zaOknom2
+zaOknom
