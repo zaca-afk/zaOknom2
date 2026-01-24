@@ -1,1 +1,2 @@
-
+zaOknom
+mobail_zaOknom
