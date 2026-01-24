@@ -1,319 +1,263 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>заОкном — Мобильная версия</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>заОкном — Innovative Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ================= ПЕРЕМЕННЫЕ ТЕМ ================= */
-        :root[data-theme="dark"] {
-            --bg-color: #000;
-            --text-color: #fff;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-color: #60a5fa;
-            --card-sub-bg: rgba(255, 255, 255, 0.02);
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent: #60a5fa;
+            --text-dim: rgba(255, 255, 255, 0.5);
         }
 
-        :root[data-theme="light"] {
-            --bg-color: #f8fafc;
-            --text-color: #0f172a;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(15, 23, 42, 0.1);
-            --accent-color: #2563eb;
-            --card-sub-bg: #fff;
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            overflow-x: hidden;
-            transition: all 0.3s ease;
+            background: var(--bg);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px 16px;
+            /* Фоновый градиент для глубины */
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050505 100%);
         }
 
-        .container {
-            width: 100%;
-            padding: 20px 15px;
-            max-width: 500px; /* Ограничение для удобства на десктопе */
-            margin: 0 auto;
-        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .city { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.5px; }
+        .status { font-size: 1rem; color: var(--text-dim); margin-top: 4px; }
 
-        /* HEADER */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
-        .city-label { font-size: 0.9rem; opacity: 0.6; text-transform: uppercase; }
-
-        /* ГЛАВНЫЙ БЛОК */
-        .main-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            padding: 30px 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            backdrop-filter: blur(20px);
-        }
-
-        .temp-now {
-            font-size: 5rem;
-            font-weight: 200;
-            margin: 10px 0;
-            line-height: 1;
-        }
-
-        .status-text {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        /* СЕТКА ПАРАМЕТРОВ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-box {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 15px 5px;
-            text-align: center;
-        }
-
-        .stat-box span { display: block; }
-        .stat-val { font-weight: 700; font-size: 1.1rem; }
-        .stat-label { font-size: 0.7rem; opacity: 0.5; text-transform: uppercase; margin-top: 4px; }
-
-        /* ГОРИЗОНТАЛЬНЫЙ ПРОГНОЗ */
-        .forecast-scroll {
-            display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            padding-bottom: 15px;
-            scrollbar-width: none; /* Firefox */
-        }
-        .forecast-scroll::-webkit-scrollbar { display: none; }
-
-        .day-card {
-            min-width: 85px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 15px 10px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .day-card.active {
-            border-color: var(--accent-color);
-            background: var(--accent-color);
-            color: white;
-        }
-
-        /* ГРАФИК */
-        .chart-container {
-            height: 200px;
-            margin-top: 20px;
-        }
-
-        /* ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (Компактный) */
-        .theme-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-color);
-            padding: 8px 15px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        #fixed-detail-pane {
-            margin-top: 20px;
+        /* ГЛАВНЫЙ ЭКРАН */
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero-temp { font-size: 7rem; font-weight: 200; position: relative; display: inline-block; letter-spacing: -4px; }
+        .hero-temp::after { content: "°"; position: absolute; top: 15px; right: -35px; font-weight: 200; }
+        
+        /* СТЕКЛЯННАЯ КАРТОЧКА */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
             padding: 20px;
-            background: var(--glass-bg);
-            border-radius: 25px;
-            display: none;
+            margin-bottom: 16px;
         }
+
+        .card-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ПОЧАСОВОЙ СКРОЛЛ */
+        .hourly-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .hourly-scroll::-webkit-scrollbar { display: none; }
+        .hour-box { text-align: center; min-width: 45px; }
+        .hour-time { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px; }
+        .hour-temp { font-size: 1.1rem; font-weight: 600; }
+
+        /* ИННОВАЦИОННАЯ ШКАЛА ПРОГНОЗА */
+        .daily-item {
+            display: grid;
+            grid-template-columns: 50px 35px 1fr 85px;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .daily-item:last-child { border: none; }
+        .day-name { font-weight: 500; font-size: 0.95rem; }
+        
+        .temp-track {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            position: relative;
+        }
+        .temp-fill {
+            position: absolute;
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(to right, #60a5fa, #fbbf24);
+        }
+        /* Точка текущей температуры (для сегодняшнего дня) */
+        .current-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            top: -1px;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .temp-range { text-align: right; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.5px; }
+        .temp-min { color: var(--text-dim); margin-right: 8px; }
+
+        /* ПЛИТКИ ПАРАМЕТРОВ */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .stat-card { min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
+        .stat-val { font-size: 2rem; font-weight: 500; }
+        .stat-hint { font-size: 0.75rem; color: var(--text-dim); }
+
+        canvas#particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <div>
-                <div class="city-label">Курган</div>
-                <h1>заОкном</h1>
-            </div>
-            <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">Светлая</button>
-        </header>
+<canvas id="particles"></canvas>
 
-        <div class="main-card">
-            <div id="e-now" style="font-size: 3rem;">☀️</div>
-            <div class="temp-now"><span id="t-now">--</span>°</div>
-            <div class="status-text" id="s-now">Загрузка...</div>
-            <div style="opacity: 0.6; font-size: 0.9rem;" id="f-now">Ощущается как --°</div>
+<div class="header">
+    <div class="city">Курган</div>
+    <div class="status" id="weather-desc">Синхронизация...</div>
+</div>
 
-            <div class="chart-container">
-                <canvas id="mainChart"></canvas>
-            </div>
-        </div>
+<div class="hero">
+    <div class="hero-temp" id="curr-temp">--</div>
+    <div class="status" id="feels-like">Ощущается как --°</div>
+</div>
 
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span id="wind-s" class="stat-val">0</span>
-                <span class="stat-label">Ветер м/с</span>
-            </div>
-            <div class="stat-box">
-                <span id="press-v" class="stat-val">0</span>
-                <span class="stat-label">Давление</span>
-            </div>
-            <div class="stat-box">
-                <span id="hum-v" class="stat-val">0</span>
-                <span class="stat-label">Влажность</span>
-            </div>
-        </div>
+<div class="glass-card">
+    <div class="card-label">⏲️ Почасовой прогноз</div>
+    <div class="hourly-scroll" id="hourly-list"></div>
+</div>
 
-        <div style="margin-bottom: 15px; font-weight: 700; font-size: 0.9rem; opacity: 0.5;">ПРОГНОЗ НА 2 НЕДЕЛИ</div>
-        <div class="forecast-scroll" id="main-grid"></div>
+<div class="glass-card">
+    <div class="card-label">📅 Прогноз на 14 дней</div>
+    <div id="daily-list"></div>
+</div>
 
-        <div id="fixed-detail-pane">
-            <div style="margin-bottom: 15px; font-weight: 700;">Детально за день</div>
-            <div class="chart-container" style="height: 180px;">
-                <canvas id="subChart"></canvas>
-            </div>
-        </div>
+<div class="stats-grid">
+    <div class="glass-card stat-card">
+        <div class="card-label">💨 Ветер</div>
+        <div class="stat-val" id="wind-val">0</div>
+        <div class="stat-hint">Метров в секунду</div>
     </div>
+    <div class="glass-card stat-card">
+        <div class="card-label">💧 Влажность</div>
+        <div class="stat-val" id="hum-val">0%</div>
+        <div class="stat-hint">Относительная</div>
+    </div>
+</div>
 
-    <script>
-        // ... (Логика JS остается почти такой же, как у тебя, но с адаптацией под новые ID) ...
-        const LAT = 55.45, LON = 65.34;
-        let globalData = null;
-        let mainChart = null;
-        let secondaryChart = null;
+<script>
+    const LAT = 55.45, LON = 65.34;
 
-        const WEATHER_CODES = {
-            0: { t: "Ясно", e: "☀️" }, 1: { t: "Ясно", e: "🌤️" }, 2: { t: "Облачно", e: "⛅" },
-            3: { t: "Пасмурно", e: "☁️" }, 45: { t: "Туман", e: "🌫️" }, 61: { t: "Дождь", e: "🌧️" },
-            71: { t: "Снег", e: "❄️" }, 95: { t: "Гроза", e: "⛈️" }
-        };
+    const W_MAP = {
+        0: "Ясно", 1: "Преимущественно ясно", 2: "Переменная облачность", 3: "Пасмурно",
+        45: "Туман", 61: "Небольшой дождь", 71: "Снег", 95: "Гроза"
+    };
 
-        async function startApp() {
-            try {
-                const api = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl&daily=temperature_2m_max,temperature_2m_min&hourly=temperature_2m&timezone=auto&forecast_days=14`;
-                const response = await fetch(api);
-                globalData = await response.json();
-                updateUI();
-                renderMainGraph();
-                renderForecast();
-            } catch (err) { console.error("Ошибка API", err); }
+    async function init() {
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code&hourly=temperature_2m&timezone=auto&forecast_days=14`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            
+            updateUI(data);
+        } catch (e) {
+            document.getElementById('weather-desc').innerText = "Ошибка обновления";
+        }
+    }
+
+    function updateUI(data) {
+        // Текущие
+        document.getElementById('curr-temp').innerText = Math.round(data.current.temperature_2m);
+        document.getElementById('feels-like').innerText = `Ощущается как ${Math.round(data.current.apparent_temperature)}°`;
+        document.getElementById('weather-desc').innerText = W_MAP[data.current.weather_code] || "Ясно";
+        document.getElementById('wind-val').innerText = Math.round(data.current.wind_speed_10m);
+        document.getElementById('hum-val').innerText = data.current.relative_humidity_2m + '%';
+
+        // Почасовой
+        const hList = document.getElementById('hourly-list');
+        for (let i = 0; i < 24; i++) {
+            const time = new Date(data.hourly.time[i]).getHours();
+            const temp = Math.round(data.hourly.temperature_2m[i]);
+            hList.innerHTML += `
+                <div class="hour-box">
+                    <div class="hour-time">${i === 0 ? 'Сейчас' : time + ':00'}</div>
+                    <div style="font-size: 1.2rem; margin-bottom: 8px;">☀️</div>
+                    <div class="hour-temp">${temp}°</div>
+                </div>
+            `;
         }
 
-        function updateUI() {
-            const cur = globalData.current;
-            document.getElementById('t-now').innerText = Math.round(cur.temperature_2m);
-            document.getElementById('s-now').innerText = WEATHER_CODES[cur.weather_code]?.t || "Ясно";
-            document.getElementById('e-now').innerText = WEATHER_CODES[cur.weather_code]?.e || "☀️";
-            document.getElementById('f-now').innerText = `Ощущается как ${Math.round(cur.apparent_temperature)}°`;
-            document.getElementById('wind-s').innerText = Math.round(cur.wind_speed_10m);
-            document.getElementById('press-v').innerText = Math.round(cur.pressure_msl * 0.75006);
-            document.getElementById('hum-v').innerText = cur.relative_humidity_2m + '%';
-        }
+        // Прогноз на 14 дней со шкалами
+        const dList = document.getElementById('daily-list');
+        const allMax = Math.max(...data.daily.temperature_2m_max);
+        const allMin = Math.min(...data.daily.temperature_2m_min);
+        const rangeWidth = allMax - allMin;
 
-        function renderForecast() {
-            const grid = document.getElementById('main-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < 14; i++) {
-                const date = new Date(globalData.daily.time[i]);
-                const card = document.createElement('div');
-                card.className = 'day-card';
-                card.innerHTML = `
-                    <div style="font-size: 0.7rem; opacity: 0.7;">${date.toLocaleDateString('ru-RU', {weekday:'short'})}</div>
-                    <div style="font-weight: 700; margin: 5px 0;">${date.getDate()}</div>
-                    <div style="font-size: 1rem; font-weight: 800;">${Math.round(globalData.daily.temperature_2m_max[i])}°</div>
-                `;
-                card.onclick = () => {
-                    document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    showDetails(i);
-                };
-                grid.appendChild(card);
+        data.daily.time.forEach((time, i) => {
+            const date = new Date(time);
+            const max = data.daily.temperature_2m_max[i];
+            const min = data.daily.temperature_2m_min[i];
+            
+            const left = ((min - allMin) / rangeWidth) * 100;
+            const width = ((max - min) / rangeWidth) * 100;
+
+            let dotHtml = '';
+            if (i === 0) { // Для сегодняшнего дня ставим точку текущей темп.
+                const dotPos = ((data.current.temperature_2m - min) / (max - min)) * 100;
+                dotHtml = `<div class="current-dot" style="left: ${dotPos}%"></div>`;
             }
-        }
 
-        function renderMainGraph() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            const accent = isLight ? '#2563eb' : '#60a5fa';
+            dList.innerHTML += `
+                <div class="daily-item">
+                    <div class="day-name">${i === 0 ? 'Сегодня' : date.toLocaleDateString('ru-RU', {weekday: 'short'})}</div>
+                    <div style="font-size: 1.1rem;">☀️</div>
+                    <div class="temp-track">
+                        <div class="temp-fill" style="left: ${left}%; width: ${width}%">
+                            ${dotHtml}
+                        </div>
+                    </div>
+                    <div class="temp-range">
+                        <span class="temp-min">${Math.round(min)}°</span>
+                        <span class="temp-max">${Math.round(max)}°</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-            if (mainChart) mainChart.destroy();
-            mainChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: globalData.hourly.time.slice(0, 12).map(t => new Date(t).getHours() + ":00"),
-                    datasets: [{
-                        data: globalData.hourly.temperature_2m.slice(0, 12),
-                        borderColor: accent,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: false } }, y: { display: false } }
-                }
-            });
-        }
+    // Фоновые частицы (пыль/снег)
+    const cvs = document.getElementById('particles'), ctx = cvs.getContext('2d');
+    let pts = [];
+    function resize() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
+    function create() {
+        pts = Array.from({length: 40}, () => ({
+            x: Math.random() * cvs.width, y: Math.random() * cvs.height,
+            s: Math.random() * 1.5, v: Math.random() * 0.2 + 0.1
+        }));
+    }
+    function loop() {
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        ctx.fillStyle = "rgba(255,255,255,0.15)";
+        pts.forEach(p => {
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
+            p.y += p.v; if (p.y > cvs.height) p.y = -5;
+        });
+        requestAnimationFrame(loop);
+    }
+    window.onresize = resize; resize(); create(); loop();
+    init();
+</script>
 
-        function showDetails(idx) {
-            const pane = document.getElementById('fixed-detail-pane');
-            pane.style.display = 'block';
-            const ctx = document.getElementById('subChart').getContext('2d');
-            const start = idx * 24;
-            const data = globalData.hourly.temperature_2m.slice(start, start + 24);
-
-            if (secondaryChart) secondaryChart.destroy();
-            secondaryChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 24}, (_, i) => i + ":00"),
-                    datasets: [{ data: data, borderColor: '#60a5fa', tension: 0.4 }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
-            });
-            pane.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.getAttribute('data-theme') === 'dark';
-            const newTheme = isDark ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            document.getElementById('theme-btn').innerText = isDark ? 'Темная' : 'Светлая';
-            renderMainGraph();
-        }
-
-        startApp();
-    </script>
 </body>
 </html>
