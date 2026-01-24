@@ -3,261 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>заОкном — Innovative Mobile</title>
+    <title>заОкном — Solar Dynamic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg: #050505;
-            --card-bg: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --bg: #020617;
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.12);
             --accent: #60a5fa;
-            --text-dim: rgba(255, 255, 255, 0.5);
+            --sun-color: #fbbf24;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: #fff;
             min-height: 100vh;
             padding: 20px 16px;
-            /* Фоновый градиент для глубины */
-            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050505 100%);
+            overflow-x: hidden;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
         }
 
-        .header { text-align: center; margin-bottom: 30px; }
-        .city { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.5px; }
-        .status { font-size: 1rem; color: var(--text-dim); margin-top: 4px; }
+        /* СОЛНЦЕ И ФОН */
+        canvas#skyCanvas { 
+            position: fixed; 
+            inset: 0; 
+            z-index: -1; 
+            pointer-events: none; 
+        }
 
-        /* ГЛАВНЫЙ ЭКРАН */
-        .hero { text-align: center; margin-bottom: 40px; }
+        .header { text-align: center; margin-bottom: 25px; position: relative; z-index: 10; }
+        .city { font-size: 1.8rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .hero-temp { font-size: 7rem; font-weight: 200; position: relative; display: inline-block; letter-spacing: -4px; }
-        .hero-temp::after { content: "°"; position: absolute; top: 15px; right: -35px; font-weight: 200; }
-        
-        /* СТЕКЛЯННАЯ КАРТОЧКА */
+        .hero-temp::after { content: "°"; position: absolute; top: 10px; right: -30px; }
+
         .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 16px;
+            background: var(--glass);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .card-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .label { font-size: 0.65rem; font-weight: 800; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 
-        /* ПОЧАСОВОЙ СКРОЛЛ */
-        .hourly-scroll {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scrollbar-width: none;
-        }
-        .hourly-scroll::-webkit-scrollbar { display: none; }
-        .hour-box { text-align: center; min-width: 45px; }
-        .hour-time { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px; }
-        .hour-temp { font-size: 1.1rem; font-weight: 600; }
+        /* ТАБЫ И ГРАФИК */
+        .chart-tabs { display: flex; background: rgba(0,0,0,0.3); border-radius: 14px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .chart-tab { flex: 1; padding: 10px; font-size: 0.7rem; font-weight: 700; text-align: center; border-radius: 10px; opacity: 0.4; transition: 0.3s; }
+        .chart-tab.active { background: var(--accent); opacity: 1; color: #000; }
+        .chart-container { height: 200px; width: 100%; position: relative; }
 
-        /* ИННОВАЦИОННАЯ ШКАЛА ПРОГНОЗА */
-        .daily-item {
-            display: grid;
-            grid-template-columns: 50px 35px 1fr 85px;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .daily-item:last-child { border: none; }
-        .day-name { font-weight: 500; font-size: 0.95rem; }
-        
-        .temp-track {
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            position: relative;
-        }
-        .temp-fill {
-            position: absolute;
-            height: 100%;
-            border-radius: 10px;
-            background: linear-gradient(to right, #60a5fa, #fbbf24);
-        }
-        /* Точка текущей температуры (для сегодняшнего дня) */
-        .current-dot {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #fff;
-            border-radius: 50%;
-            top: -1px;
-            box-shadow: 0 0 10px #fff;
-        }
+        /* ИНФО О СОЛНЦЕ */
+        .astro-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; margin-top: 5px; }
+        .astro-val { font-size: 1.1rem; font-weight: 600; color: var(--sun-color); }
+        .astro-lab { font-size: 0.65rem; opacity: 0.5; text-transform: uppercase; }
 
-        .temp-range { text-align: right; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.5px; }
-        .temp-min { color: var(--text-dim); margin-right: 8px; }
-
-        /* ПЛИТКИ ПАРАМЕТРОВ */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .stat-card { min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
-        .stat-val { font-size: 2rem; font-weight: 500; }
-        .stat-hint { font-size: 0.75rem; color: var(--text-dim); }
-
-        canvas#particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        /* ПРОГНОЗ */
+        .day-row { display: grid; grid-template-columns: 50px 35px 1fr 85px; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .progress-track { height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; }
+        .progress-fill { position: absolute; height: 100%; border-radius: 10px; background: linear-gradient(to right, #3b82f6, #fbbf24); }
+        .temp-range { text-align: right; font-size: 0.95rem; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
+<canvas id="skyCanvas"></canvas>
 
 <div class="header">
     <div class="city">Курган</div>
-    <div class="status" id="weather-desc">Синхронизация...</div>
+    <div id="weather-status" style="opacity: 0.7;">Загрузка атмосферы...</div>
 </div>
 
-<div class="hero">
-    <div class="hero-temp" id="curr-temp">--</div>
-    <div class="status" id="feels-like">Ощущается как --°</div>
-</div>
-
-<div class="glass-card">
-    <div class="card-label">⏲️ Почасовой прогноз</div>
-    <div class="hourly-scroll" id="hourly-list"></div>
+<div style="text-align: center; margin-bottom: 30px;">
+    <div class="hero-temp" id="t-now">--</div>
+    <div id="feels-now" style="opacity: 0.5; font-size: 1.1rem; margin-top: -10px;">Ощущается как --°</div>
 </div>
 
 <div class="glass-card">
-    <div class="card-label">📅 Прогноз на 14 дней</div>
-    <div id="daily-list"></div>
+    <div class="chart-tabs">
+        <div class="chart-tab active" onclick="switchChart('temp', this)">ТЕМП.</div>
+        <div class="chart-tab" onclick="switchChart('pressure', this)">ДАВЛЕНИЕ</div>
+        <div class="chart-tab" onclick="switchChart('wind', this)">ВЕТЕР</div>
+    </div>
+    <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+    </div>
 </div>
 
-<div class="stats-grid">
-    <div class="glass-card stat-card">
-        <div class="card-label">💨 Ветер</div>
-        <div class="stat-val" id="wind-val">0</div>
-        <div class="stat-hint">Метров в секунду</div>
+<div class="glass-card">
+    <div class="label">☀️ Солнечный тайминг</div>
+    <div class="astro-info">
+        <div>
+            <div class="astro-val" id="sunrise">--:--</div>
+            <div class="astro-lab">Восход</div>
+        </div>
+        <div>
+            <div class="astro-val" id="sunset">--:--</div>
+            <div class="astro-lab">Закат</div>
+        </div>
     </div>
-    <div class="glass-card stat-card">
-        <div class="card-label">💧 Влажность</div>
-        <div class="stat-val" id="hum-val">0%</div>
-        <div class="stat-hint">Относительная</div>
-    </div>
+</div>
+
+<div class="glass-card" id="daily-container">
+    <div class="label">📅 Прогноз на 14 дней</div>
 </div>
 
 <script>
     const LAT = 55.45, LON = 65.34;
+    let weatherData = null;
+    let mainChart = null;
 
-    const W_MAP = {
-        0: "Ясно", 1: "Преимущественно ясно", 2: "Переменная облачность", 3: "Пасмурно",
-        45: "Туман", 61: "Небольшой дождь", 71: "Снег", 95: "Гроза"
+    const WEATHER_MAP = {
+        0: "Ясно", 1: "Почти ясно", 2: "Облачно", 3: "Пасмурно", 45: "Туман", 61: "Дождь", 71: "Снег", 95: "Гроза"
     };
 
-    async function init() {
+    async function startApp() {
         try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code&hourly=temperature_2m&timezone=auto&forecast_days=14`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code&hourly=temperature_2m,pressure_msl,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=14`;
             const res = await fetch(url);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
+            weatherData = await res.json();
             
-            updateUI(data);
-        } catch (e) {
-            document.getElementById('weather-desc').innerText = "Ошибка обновления";
-        }
+            updateHeader();
+            renderDaily();
+            switchChart('temp', document.querySelector('.chart-tab.active'));
+            
+            // Запуск анимации неба
+            initSky();
+        } catch (e) { console.error(e); }
     }
 
-    function updateUI(data) {
-        // Текущие
-        document.getElementById('curr-temp').innerText = Math.round(data.current.temperature_2m);
-        document.getElementById('feels-like').innerText = `Ощущается как ${Math.round(data.current.apparent_temperature)}°`;
-        document.getElementById('weather-desc').innerText = W_MAP[data.current.weather_code] || "Ясно";
-        document.getElementById('wind-val').innerText = Math.round(data.current.wind_speed_10m);
-        document.getElementById('hum-val').innerText = data.current.relative_humidity_2m + '%';
+    function updateHeader() {
+        document.getElementById('t-now').innerText = Math.round(weatherData.current.temperature_2m);
+        document.getElementById('feels-now').innerText = `Ощущается как ${Math.round(weatherData.current.apparent_temperature)}°`;
+        document.getElementById('weather-status').innerText = WEATHER_MAP[weatherData.current.weather_code] || "Ясно";
+        
+        document.getElementById('sunrise').innerText = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+        document.getElementById('sunset').innerText = new Date(weatherData.daily.sunset[0]).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+    }
 
-        // Почасовой
-        const hList = document.getElementById('hourly-list');
-        for (let i = 0; i < 24; i++) {
-            const time = new Date(data.hourly.time[i]).getHours();
-            const temp = Math.round(data.hourly.temperature_2m[i]);
-            hList.innerHTML += `
-                <div class="hour-box">
-                    <div class="hour-time">${i === 0 ? 'Сейчас' : time + ':00'}</div>
-                    <div style="font-size: 1.2rem; margin-bottom: 8px;">☀️</div>
-                    <div class="hour-temp">${temp}°</div>
-                </div>
-            `;
-        }
+    function switchChart(type, el) {
+        document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        if (mainChart) mainChart.destroy();
 
-        // Прогноз на 14 дней со шкалами
-        const dList = document.getElementById('daily-list');
-        const allMax = Math.max(...data.daily.temperature_2m_max);
-        const allMin = Math.min(...data.daily.temperature_2m_min);
-        const rangeWidth = allMax - allMin;
+        let dataPoints = [], color = '#60a5fa', suffix = '°';
+        if(type === 'temp') { dataPoints = weatherData.hourly.temperature_2m.slice(0, 24); }
+        else if(type === 'pressure') { dataPoints = weatherData.hourly.pressure_msl.slice(0, 24).map(p => Math.round(p*0.75)); color = '#a78bfa'; suffix = ''; }
+        else { dataPoints = weatherData.hourly.wind_speed_10m.slice(0, 24); color = '#34d399'; suffix = ' м/с'; }
 
-        data.daily.time.forEach((time, i) => {
-            const date = new Date(time);
-            const max = data.daily.temperature_2m_max[i];
-            const min = data.daily.temperature_2m_min[i];
-            
-            const left = ((min - allMin) / rangeWidth) * 100;
-            const width = ((max - min) / rangeWidth) * 100;
-
-            let dotHtml = '';
-            if (i === 0) { // Для сегодняшнего дня ставим точку текущей темп.
-                const dotPos = ((data.current.temperature_2m - min) / (max - min)) * 100;
-                dotHtml = `<div class="current-dot" style="left: ${dotPos}%"></div>`;
+        mainChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => ((new Date().getHours() + i) % 24) + ":00"),
+                datasets: [{
+                    data: dataPoints,
+                    borderColor: color,
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: true,
+                    backgroundColor: 'rgba(255,255,255,0.05)'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 9 }, maxTicksLimit: 6 }, grid: { display: false } },
+                    y: { display: false }
+                }
             }
-
-            dList.innerHTML += `
-                <div class="daily-item">
-                    <div class="day-name">${i === 0 ? 'Сегодня' : date.toLocaleDateString('ru-RU', {weekday: 'short'})}</div>
-                    <div style="font-size: 1.1rem;">☀️</div>
-                    <div class="temp-track">
-                        <div class="temp-fill" style="left: ${left}%; width: ${width}%">
-                            ${dotHtml}
-                        </div>
-                    </div>
-                    <div class="temp-range">
-                        <span class="temp-min">${Math.round(min)}°</span>
-                        <span class="temp-max">${Math.round(max)}°</span>
-                    </div>
-                </div>
-            `;
         });
     }
 
-    // Фоновые частицы (пыль/снег)
-    const cvs = document.getElementById('particles'), ctx = cvs.getContext('2d');
-    let pts = [];
-    function resize() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
-    function create() {
-        pts = Array.from({length: 40}, () => ({
-            x: Math.random() * cvs.width, y: Math.random() * cvs.height,
-            s: Math.random() * 1.5, v: Math.random() * 0.2 + 0.1
+    function renderDaily() {
+        const container = document.getElementById('daily-container');
+        const daily = weatherData.daily;
+        const absMax = Math.max(...daily.temperature_2m_max);
+        const absMin = Math.min(...daily.temperature_2m_min);
+
+        daily.time.forEach((t, i) => {
+            const date = new Date(t);
+            const max = daily.temperature_2m_max[i];
+            const min = daily.temperature_2m_min[i];
+            const left = ((min - absMin) / (absMax - absMin)) * 100;
+            const width = ((max - min) / (absMax - absMin)) * 100;
+
+            const row = document.createElement('div');
+            row.className = 'day-row';
+            row.innerHTML = `
+                <div style="font-weight:500; font-size:0.85rem;">${i===0 ? 'Сегодня' : date.toLocaleDateString('ru-RU', {weekday:'short'})}</div>
+                <div style="font-size:1.1rem;">☀️</div>
+                <div class="progress-track"><div class="progress-fill" style="left:${left}%; width:${width}%"></div></div>
+                <div class="temp-range">
+                    <span style="opacity:0.4; margin-right:8px;">${Math.round(min)}°</span>
+                    <span>${Math.round(max)}°</span>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // ЛОГИКА НЕБА И ДВИЖУЩЕГОСЯ СОЛНЦА
+    const canvas = document.getElementById('skyCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function initSky() {
+        window.addEventListener('resize', resizeSky);
+        resizeSky();
+        createStars();
+        animateSky();
+    }
+
+    function resizeSky() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function createStars() {
+        stars = Array.from({length: 50}, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 1.5,
+            blink: Math.random() * 0.05
         }));
     }
-    function loop() {
-        ctx.clearRect(0,0,cvs.width,cvs.height);
-        ctx.fillStyle = "rgba(255,255,255,0.15)";
-        pts.forEach(p => {
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-            p.y += p.v; if (p.y > cvs.height) p.y = -5;
-        });
-        requestAnimationFrame(loop);
-    }
-    window.onresize = resize; resize(); create(); loop();
-    init();
-</script>
 
+    function animateSky() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const now = new Date();
+        const sunrise = new Date(weatherData.daily.sunrise[0]);
+        const sunset = new Date(weatherData.daily.sunset[0]);
+
+        // Рисуем звезды (ярче, если ночь)
+        const nightFactor = (now < sunrise || now > sunset) ? 1 : 0.2;
+        ctx.fillStyle = `rgba(255, 255, 255, ${nightFactor})`;
+        stars.forEach(s => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Движение солнца по дуге
+        if (now >= sunrise && now <= sunset) {
+            const totalDaylight = sunset - sunrise;
+            const currentProgress = (now - sunrise) / totalDaylight; // 0 to 1
+
+            // Параметры дуги
+            const arcWidth = canvas.width + 200;
+            const arcHeight = canvas.height * 0.4;
+            const x = (currentProgress * arcWidth) - 100;
+            // Математика дуги: y = height * sin(PI * progress)
+            const y = (canvas.height * 0.5) - Math.sin(Math.PI * currentProgress) * arcHeight;
+
+            // Рисуем солнце
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, 60);
+            grad.addColorStop(0, 'rgba(251, 191, 36, 1)');
+            grad.addColorStop(0.3, 'rgba(251, 191, 36, 0.4)');
+            grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(x, y, 60, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ядро солнца
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        requestAnimationFrame(animateSky);
+    }
+
+    startApp();
+</script>
 </body>
 </html>
