@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>заОкном — Выбор версии</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -14,7 +14,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
         }
 
@@ -27,61 +27,101 @@
 
         .choice-container {
             text-align: center;
-            padding: 20px;
-            max-width: 500px;
+            padding: 24px;
+            max-width: 520px;
             width: 100%;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: clamp(2.8rem, 9vw, 4rem);
             font-weight: 800;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
+            margin: 0 0 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #60a5fa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        p {
-            opacity: 0.6;
-            margin-bottom: 40px;
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.65;
+            margin: 0 0 40px;
         }
 
         .buttons-stack {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
         }
 
         .btn {
-            padding: 20px;
-            border-radius: 20px;
+            padding: 18px 24px;
+            border-radius: 16px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-auto {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: white;
+            font-size: 1.15rem;
+            padding: 22px 28px;
+            box-shadow: 0 8px 32px rgba(96, 165, 250, 0.4);
+            border: none;
         }
 
         .btn-mobile {
-            background: #60a5fa;
-            color: #000;
+            background: rgba(96, 165, 250, 0.18);
+            color: #60a5fa;
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .btn-mobile2 {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .btn-desktop {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
+            background: rgba(255,255,255,0.06);
+            color: #e2e8f0;
+            border-color: rgba(255,255,255,0.15);
         }
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(96, 165, 250, 0.3);
+            box-shadow: 0 12px 40px rgba(96, 165, 250, 0.35);
         }
 
-        .icon { font-size: 1.5rem; }
+        .btn-auto:hover {
+            box-shadow: 0 16px 48px rgba(96, 165, 250, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .icon {
+            font-size: 1.6rem;
+            opacity: 0.9;
+        }
+
+        .small-hint {
+            font-size: 0.9rem;
+            opacity: 0.55;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.6rem; }
+            .btn { font-size: 1rem; padding: 16px 20px; }
+            .btn-auto { font-size: 1.1rem; padding: 20px 24px; }
+        }
     </style>
 </head>
 <body>
@@ -89,16 +129,63 @@
 
     <div class="choice-container">
         <h1>заОкном</h1>
-        <p>Выберите версию интерфейса</p>
+        <p class="subtitle">Выберите версию приложения</p>
 
         <div class="buttons-stack">
+
+            <a href="#" id="auto-link" class="btn btn-auto">
+                <span class="icon">✨</span> Открыть подходящую версию автоматически
+            </a>
+
             <a href="mobile.html" class="btn btn-mobile">
                 <span class="icon">📱</span> Мобильная версия
+                <div class="small-hint">для смартфонов</div>
             </a>
+
+            <a href="mobile2.html" class="btn btn-mobile2">
+                <span class="icon">📱</span> Мобильная версия 2
+                <div class="small-hint">для планшетов / больших экранов</div>
+            </a>
+
             <a href="desktop.html" class="btn btn-desktop">
-                <span class="icon">💻</span> Полная версия
+                <span class="icon">💻</span> Полная версия (ПК)
+                <div class="small-hint">максимум информации</div>
             </a>
+
         </div>
     </div>
+
+    <script>
+        // Простое определение типа устройства
+        (function() {
+            const ua = navigator.userAgent.toLowerCase();
+            const w = window.innerWidth;
+
+            const isMobile = /mobile|android|iphone|ipod|blackberry|iemobile|opera mini/.test(ua) || w <= 768;
+            const isTablet = /ipad|tablet|kindle|playbook|silk/.test(ua) || 
+                             (w > 768 && w <= 1024 && ('ontouchstart' in window || navigator.maxTouchPoints > 1));
+
+            let href = "desktop.html";
+            let text = "Открыть полную версию";
+
+            if (isTablet) {
+                href = "mobile2.html";
+                text = "Открыть мобильную версию 2";
+            } else if (isMobile) {
+                href = "mobile.html";
+                text = "Открыть мобильную версию";
+            }
+
+            const link = document.getElementById("auto-link");
+            link.href = href;
+            link.innerHTML = `<span class="icon">✨</span> ${text}`;
+
+            // Авто-переход через 3 секунды (можно убрать)
+            setTimeout(() => {
+                window.location.href = href;
+            }, 3000);
+
+        })();
+    </script>
 </body>
 </html>
