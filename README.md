@@ -125,7 +125,7 @@
 
             <a href="mobile2.html" class="btn btn-mobile2">
                 <span class="icon">📱</span> Мобильная версия 2
-                <div class="small-hint">для планшетов / больших экранов</div>
+                <div class="small-hint">для смартфонов только БОЛЬШЕ</div>
             </a>
 
             <a href="desktop.html" class="btn btn-desktop">
