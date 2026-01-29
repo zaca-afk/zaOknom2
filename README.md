@@ -69,15 +69,6 @@
             backdrop-filter: blur(8px);
         }
 
-        .btn-auto {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            color: white;
-            font-size: 1.15rem;
-            padding: 22px 28px;
-            box-shadow: 0 8px 32px rgba(96, 165, 250, 0.4);
-            border: none;
-        }
-
         .btn-mobile {
             background: rgba(96, 165, 250, 0.18);
             color: #60a5fa;
@@ -101,11 +92,6 @@
             box-shadow: 0 12px 40px rgba(96, 165, 250, 0.35);
         }
 
-        .btn-auto:hover {
-            box-shadow: 0 16px 48px rgba(96, 165, 250, 0.5);
-            transform: translateY(-4px);
-        }
-
         .icon {
             font-size: 1.6rem;
             opacity: 0.9;
@@ -120,7 +106,6 @@
         @media (max-width: 480px) {
             h1 { font-size: 2.6rem; }
             .btn { font-size: 1rem; padding: 16px 20px; }
-            .btn-auto { font-size: 1.1rem; padding: 20px 24px; }
         }
     </style>
 </head>
@@ -132,10 +117,6 @@
         <p class="subtitle">Выберите версию приложения</p>
 
         <div class="buttons-stack">
-
-            <a href="#" id="auto-link" class="btn btn-auto">
-                <span class="icon">✨</span> Открыть подходящую версию автоматически
-            </a>
 
             <a href="mobile.html" class="btn btn-mobile">
                 <span class="icon">📱</span> Мобильная версия
@@ -154,38 +135,5 @@
 
         </div>
     </div>
-
-    <script>
-        // Простое определение типа устройства
-        (function() {
-            const ua = navigator.userAgent.toLowerCase();
-            const w = window.innerWidth;
-
-            const isMobile = /mobile|android|iphone|ipod|blackberry|iemobile|opera mini/.test(ua) || w <= 768;
-            const isTablet = /ipad|tablet|kindle|playbook|silk/.test(ua) || 
-                             (w > 768 && w <= 1024 && ('ontouchstart' in window || navigator.maxTouchPoints > 1));
-
-            let href = "desktop.html";
-            let text = "Открыть полную версию";
-
-            if (isTablet) {
-                href = "mobile2.html";
-                text = "Открыть мобильную версию 2";
-            } else if (isMobile) {
-                href = "mobile.html";
-                text = "Открыть мобильную версию";
-            }
-
-            const link = document.getElementById("auto-link");
-            link.href = href;
-            link.innerHTML = `<span class="icon">✨</span> ${text}`;
-
-            // Авто-переход через 3 секунды (можно убрать)
-            setTimeout(() => {
-                window.location.href = href;
-            }, 3000);
-
-        })();
-    </script>
 </body>
 </html>
