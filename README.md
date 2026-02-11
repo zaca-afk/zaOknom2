@@ -117,14 +117,10 @@
         <p class="subtitle">Выберите версию приложения</p>
 
         <div class="buttons-stack">
-
-            <a href="mobile.html" class="btn btn-mobile">
-                <span class="icon">📱</span> Мобильная версия
-                <div class="small-hint">для смартфонов</div>
-            </a>
+        
 
             <a href="mobile2.html" class="btn btn-mobile2">
-                <span class="icon">📱</span> Мобильная версия 2
+                <span class="icon">📱</span> Мобильная версия 
                 <div class="small-hint">для смартфонов только БОЛЬШЕ</div>
             </a>
 
