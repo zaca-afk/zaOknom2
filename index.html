@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>заОкном — Выбор версии</title>
+    <title>заОкном</title>
+    
+    <!-- Автоопределение устройства и мгновенный редирект -->
+    <script>
+        function isMobile() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const width = window.innerWidth;
+
+            return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua) ||
+                   (width <= 1024); // если ширина экрана ≤ 1024px — считаем мобильным/планшетом
+        }
+
+        // Сразу перенаправляем (выполняется ещё до загрузки страницы)
+        if (isMobile()) {
+            window.location.replace("mobile2.html");     // ← твоя мобильная версия
+        } else {
+            window.location.replace("desktop.html");     // ← твоя версия для ПК
+        }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Твой стиль оставляем как резерв (если вдруг JS отключён) */
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
@@ -17,119 +37,41 @@
             min-height: 100vh;
             overflow: hidden;
         }
-
         .bg-gradient {
             position: fixed;
             inset: 0;
             background: radial-gradient(circle at center, #1e293b 0%, #000 100%);
             z-index: -1;
         }
-
         .choice-container {
             text-align: center;
             padding: 24px;
             max-width: 520px;
             width: 100%;
         }
-
-        h1 {
-            font-size: clamp(2.8rem, 9vw, 4rem);
-            font-weight: 800;
-            margin: 0 0 12px;
-            background: linear-gradient(135deg, #ffffff 0%, #60a5fa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.65;
-            margin: 0 0 40px;
-        }
-
-        .buttons-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .btn {
-            padding: 18px 24px;
-            border-radius: 16px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.05rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            backdrop-filter: blur(8px);
-        }
-
-        .btn-mobile {
-            background: rgba(96, 165, 250, 0.18);
-            color: #60a5fa;
-            border-color: rgba(96, 165, 250, 0.35);
-        }
-
-        .btn-mobile2 {
-            background: rgba(139, 92, 246, 0.15);
-            color: #a78bfa;
-            border-color: rgba(139, 92, 246, 0.3);
-        }
-
-        .btn-desktop {
-            background: rgba(255,255,255,0.06);
-            color: #e2e8f0;
-            border-color: rgba(255,255,255,0.15);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(96, 165, 250, 0.35);
-        }
-
-        .icon {
-            font-size: 1.6rem;
-            opacity: 0.9;
-        }
-
-        .small-hint {
-            font-size: 0.9rem;
-            opacity: 0.55;
-            margin-top: 6px;
-        }
-
-        @media (max-width: 480px) {
-            h1 { font-size: 2.6rem; }
-            .btn { font-size: 1rem; padding: 16px 20px; }
-        }
+        /* ... весь остальной CSS ты можешь оставить без изменений ... */
     </style>
 </head>
 <body>
-    <div class="bg-gradient"></div>
-
-    <div class="choice-container">
-        <h1>заОкном</h1>
-        <p class="subtitle">Выберите версию приложения</p>
-
-        <div class="buttons-stack">
-
-
-            <a href="mobile2.html" class="btn btn-mobile2">
-                <span class="icon">📱</span> Мобильная версия 2
-                <div class="small-hint">так же подходит для планшетов</div>
-            </a>
-
-            <a href="desktop.html" class="btn btn-desktop">
-                <span class="icon">💻</span> Версия для пк
-                <div class="small-hint">максимум информации</div>
-            </a>
-
+    <!-- Если JavaScript отключён или очень медленно грузится — покажем выбор -->
+    <noscript>
+        <div class="bg-gradient"></div>
+        <div class="choice-container">
+            <h1>заОкном</h1>
+            <p class="subtitle">Выберите версию приложения</p>
+            <div class="buttons-stack">
+                <a href="mobile2.html" class="btn btn-mobile2">
+                    <span class="icon">📱</span> Мобильная версия 2
+                    <div class="small-hint">так же подходит для планшетов</div>
+                </a>
+                <a href="desktop.html" class="btn btn-desktop">
+                    <span class="icon">💻</span> Версия для пк
+                    <div class="small-hint">максимум информации</div>
+                </a>
+            </div>
         </div>
-    </div>
+    </noscript>
+
+    <!-- Если JS работает — пользователь даже не увидит эту страницу -->
 </body>
 </html>
